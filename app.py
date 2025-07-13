@@ -4,7 +4,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 import uvicorn
+import os
 from model_loader import load_models, get_scores
+
+origins = [
+    "http://127.0.0.1",
+    "http://localhost",
+    os.environ.get("CORS_ORIGINS", "*") # Get the live URL from Render
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app = FastAPI(title="Lead Scoring API")
 leads_db = []
