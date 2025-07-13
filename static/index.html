@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lead Scoring Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include Chart.js library from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Lead Intent Dashboard</h1>
+            <p>A full-stack application demonstrating a production-ready lead scoring pipeline.</p>
+        </header>
+
+        <!-- The form and table are now side-by-side on larger screens -->
+        <div class="main-layout">
+            <div class="form-container">
+                <section class="card">
+                    <h2>Submit a New Lead</h2>
+                    <form id="lead-form">
+                        <!-- All form fields from the previous step remain the same -->
+                        <div class="form-row">
+                             <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" required placeholder="name@example.com"></div>
+                             <div class="form-group"><label for="city">City</label><select id="city" required><option>Mumbai</option><option>Delhi</option><option>Bangalore</option><option>Other</option></select></div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group"><label for="age_group">Age Group</label><select id="age_group" required><option>18-25</option><option>26-35</option><option>36-50</option><option>51+</option></select></div>
+                             <div class="form-group"><label for="gender">Gender</label><select id="gender" required><option>Male</option><option>Female</option></select></div>
+                             <div class="form-group"><label for="family_background">Family Status</label><select id="family_background" required><option>Single</option><option>Married</option><option>Married with Kids</option></select></div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group"><label for="profession">Profession</label><select id="profession" required><option>Software Engineer</option><option>Doctor</option><option>Business Owner</option><option>Other</option></select></div>
+                             <div class="form-group"><label for="education">Education</label><select id="education" required><option>Graduate</option><option>Post Graduate</option><option>Professional</option></select></div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group"><label for="income_inr">Annual Income (INR)</label><select id="income_inr" required><option value="500000">Below 10 Lakhs</option><option value="1500000">10-20 Lakhs</option><option value="7500000">50+ Lakhs</option></select></div>
+                             <div class="form-group"><label for="credit_score">Credit Score: <span id="credit_score_value">650</span></label><input type="range" id="credit_score" min="300" max="850" value="650" class="slider"></div>
+                        </div>
+                         <div class="form-row">
+                            <div class="form-group"><label for="page_views">Page Views</label><input type="number" id="page_views" required min="0" value="10"></div>
+                            <div class="form-group"><label for="time_spent_website_secs">Time Spent (s)</label><input type="number" id="time_spent_website_secs" required min="0" value="300"></div>
+                        </div>
+                         <div class="form-row">
+                            <div class="form-group"><label for="form_submissions">Form Submissions</label><input type="number" id="form_submissions" required min="0" value="1"></div>
+                            <div class="form-group"><label for="previous_interactions">Previous Interactions</label><input type="number" id="previous_interactions" required min="0" value="0"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label for="lead_source">Lead Source</label><select id="lead_source" required><option>Google</option><option>Direct Traffic</option><option>Reference</option></select></div>
+                            <div class="form-group"><label for="property_type_preference">Property Preference</label><select id="property_type_preference" required><option>2BHK</option><option>3BHK</option><option>Villa</option></select></div>
+                        </div>
+                        <div class="form-group"><label for="comments">Comments (for Reranking)</label><textarea id="comments" rows="3" placeholder="e.g., 'Ready to buy immediately'"></textarea></div>
+                        <div class="form-consent"><input type="checkbox" id="consent" required><label for="consent">I consent to data processing.</label></div>
+                        <button type="submit" id="submit-btn">Get Accurate Score</button>
+                    </form>
+                </section>
+            </div>
+
+            <div class="data-container">
+                <!-- Chart Section -->
+                <section class="card">
+                    <h2>Lead Score Distribution</h2>
+                    <div class="chart-container">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+                </section>
+                
+                <!-- Table Section -->
+                <section class="card">
+                    <div class="table-header">
+                        <h2>Scored Leads</h2>
+                        <button id="sort-btn">Sort by Score ↓</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead><tr><th>Email</th><th>Comments</th><th>Initial Score</th><th>Reranked Score</th></tr></thead>
+                            <tbody id="leads-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
