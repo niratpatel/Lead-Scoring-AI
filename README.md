@@ -14,15 +14,15 @@ This is not just a model; it's a complete, end-to-end web application that solve
 
 The entire application is deployed with a modern, decoupled architecture and is accessible at the link above.
 
-## Key Features
+## ✨ Key Features
 
--   **Real-Time AI Scoring:** A user-friendly form that provides an instant, AI-generated intent score upon submission.
--   **Contextual Reranking:** A rule-based system analyzes user comments (e.g., "ready to buy immediately") to adjust the ML score, capturing explicit intent that a statistical model would miss.
--   **Interactive Dashboard:** A dynamic chart visualizes the distribution of lead quality, providing an at-a-glance overview for sales managers.
--   **Persistent Sessions:** Scored leads are saved to the browser's `localStorage`, so the data persists even after a page refresh.
--   **Fully Deployed:** A complete CI/CD pipeline with a FastAPI backend on Render and a high-performance frontend on GitHub Pages, accessible via a public URL with low latency.
+-   **⚡ Real-Time AI Scoring:** A user-friendly form that provides an instant, AI-generated intent score upon submission.
+-   **📝 Contextual Reranking:** A rule-based system analyzes user comments (e.g., "ready to buy immediately") to adjust the ML score, capturing explicit intent that a statistical model would miss.
+-   **📊 Interactive Dashboard:** A dynamic chart visualizes the distribution of lead quality, providing an at-a-glance overview for sales managers.
+-   **💾 Persistent Sessions:** Scored leads are saved to the browser's `localStorage`, so the data persists even after a page refresh.
+-   **🚀 Fully Deployed:** A complete CI/CD pipeline with a FastAPI backend on Render and a high-performance frontend on GitHub Pages, accessible via a public URL with low latency.
 
-## Tech Stack & Architecture
+## 🛠️ Tech Stack & Architecture
 
 This project was built with a professional, decoupled architecture to ensure scalability and maintainability.
 
@@ -35,8 +35,8 @@ This project was built with a professional, decoupled architecture to ensure sca
 |                    | FastAPI                       | A modern, high-performance web framework for building the RESTful API. |
 |                    | Pydantic                      | For robust, automatic data validation at the API level.                |
 |                    | Render                        | For scalable, cloud-based hosting of the Python backend.               |
-| **Machine Learning** | Scikit-learn                  | For building the robust data preprocessing and modeling pipeline.      |
-|                    | LightGBM                      | The industry-standard gradient boosting model for high performance.    |
+| **Machine Learning** | Scikit-learn                  | For building the entire data preprocessing and modeling pipeline.      |
+|                    | Ensemble Methods              | Using a `VotingClassifier` to combine diverse models for accuracy.     |
 |                    | Joblib                        | For serializing and deserializing the trained ML pipeline object.      |
 
 ### System Architecture Flow
@@ -45,17 +45,26 @@ A user's request flows through a modern, decoupled system:
 
 `User Browser` → `GitHub Pages (HTML/CSS/JS)` → `Render (FastAPI Backend)` → `ML Model & Reranker` → `JSON Response`
 
-## The Machine Learning Core
+## 🧠 The Machine Learning Core
 
-The heart of the application is a pipeline designed to extract a reliable predictive signal from a noisy, real-world dataset.
+The heart of the application is a sophisticated, multi-stage pipeline designed to systematically overcome the challenges of a noisy, imbalanced dataset. This architecture was chosen after initial experiments proved that a simple model was not sufficient.
 
-1.  **Feature Engineering:** The pipeline begins by creating high-impact features from raw data, such as `days_since_creation` (to capture lead decay) and `submission_to_view_ratio` (to measure user intent). It also uses context-aware imputation, for example, by filling a missing income value with the median income of the lead's stated profession.
+### The Three-Stage Pipeline
 
-2.  **The Model: Why LightGBM?** After initial experiments, **LightGBM** (`LGBMClassifier`) was chosen for its optimal balance of speed and power. It is the industry standard for production systems working with tabular data because its unique leaf-wise growth algorithm is significantly faster than alternatives, ensuring the API meets its strict low-latency requirements. Its powerful built-in regularization also makes it highly effective at handling the noisy features present in the dataset.
+1.  **Stage 1: Advanced Preprocessing (`ColumnTransformer`)**
+    The pipeline begins by intelligently preparing the data. It uses context-aware imputation (e.g., filling missing `income` with the median of the lead's `profession`), scales numerical data with `RobustScaler` to handle outliers, and one-hot encodes categorical data, creating a clean feature set ready for modeling.
 
-3.  **The Reranker:** A rule-based module provides a crucial final layer of business logic. It scans user comments for high-intent keywords ("urgent", "schedule a call") and negative keywords ("just browsing", "too expensive") to make a final adjustment to the score. This hybrid approach—combining statistical patterns with explicit user intent—creates a final score that is both more accurate and more interpretable.
+2.  **Stage 2: Automated Feature Selection (`SelectFromModel`)**
+    This is the most critical stage for this project. The dataset contains many "noisy" features that can confuse a model and hurt its precision. To solve this, a `RandomForestClassifier` is first used to evaluate the predictive power of every feature. Then, `SelectFromModel` **automatically discards the weaker, low-signal features**. This forces the final classifier to train *only* on the most valuable information, a key strategy for improving performance on complex, real-world data.
 
-## Challenges & Solutions
+3.  **Stage 3: Weighted Ensemble Classifier (`VotingClassifier`)**
+    The final prediction is not made by one model, but by three diverse models working together. The ensemble combines the predictions of:
+    -   A **Logistic Regression** model (for a stable, linear baseline).
+    -   A **Random Forest** model (to capture non-linear interactions).
+    -   A **Gradient Boosting** model (for high predictive power).
+    By taking a weighted average of their outputs, the `VotingClassifier` produces a final score that is more robust, reliable, and accurate than any single model could be on its own.
+
+## 🚀 Challenges & Solutions
 
 Building and deploying a full-stack ML application presents real-world challenges. Overcoming them was a key part of this project.
 
@@ -80,7 +89,7 @@ Building and deploying a full-stack ML application presents real-world challenge
 2.  **Setup Python Environment:**
     ```bash
     python -m venv venv
-    source ven/bin/activate  # On Windows, use `venv\Scripts\activate`
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     pip install -r requirements.txt
     ```
 
