@@ -13,16 +13,12 @@ origins = [
     os.environ.get("CORS_ORIGINS", "*") # Get the live URL from Render
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 
 app = FastAPI(title="Lead Scoring API")
 leads_db = []
+
+
 
 @app.on_event("startup")
 def startup_event():
@@ -35,7 +31,13 @@ class Lead(BaseModel):
     profession: str; city: str; property_type_preference: str; lead_source: str
     gender: str; age_group: str; education: str; family_background: str; comments: str = ""
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/score")
 def score_lead(lead: Lead):
