@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://lead-scoring-ai.onrender.com'; 
     const form = document.getElementById('lead-form');
     const tableBody = document.getElementById('leads-table-body');
     const submitBtn = document.getElementById('submit-btn');
