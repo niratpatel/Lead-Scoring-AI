@@ -20,7 +20,7 @@ class HighPerformanceLeadScoringModel:
 class EnhancedReranker:
     def __init__(self):
         self.intent_keywords = { 'ready to buy': 25, 'book now': 25, 'immediate': 20, 'loan pre-approved': 20, 'urgent': 18, 'booking': 18, 'schedule a call': 15, 'site visit': 15, 'final price': 12, 'interested': 8, 'budget': 8, 'details': 5, 'floor plan': 5, 'looking for': 3, 'not interested': -30, 'just browsing': -25, 'researching': -20, 'too expensive': -20, 'not sure': -15, 'just checking': -15, 'later': -10 }
--
+
     def get_reranked_score(self, comment_text, initial_score):
         if pd.isna(comment_text):
             return initial_score
