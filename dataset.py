@@ -12,18 +12,18 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
     - ML model is trained on structured features only
     - Comments are used exclusively for reranking
     - Target variable is generated WITHOUT considering comments
-    - FIXED: Realistic distribution with ~20% high intent leads
+    - Realistic distribution with ~20% high intent leads
     """
     np.random.seed(random_state)
     
-    # --- 1. DEMOGRAPHICS (Enhanced) ---
+    # --- 1. DEMOGRAPHICS ---
     age_groups = ['18-25', '26-35', '36-50', '51+']
     age_group_probs = [0.15, 0.40, 0.35, 0.10]
     age_group_choices = np.random.choice(age_groups, size=n_samples, p=age_group_probs)
     
     gender_choices = np.random.choice(['Male', 'Female'], size=n_samples, p=[0.60, 0.40])
 
-    # Enhanced location field with tier-based cities
+    # location field with tier-based cities
     tier1_cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad']
     tier2_cities = ['Surat', 'Vadodara', 'Rajkot', 'Indore', 'Bhopal', 'Coimbatore', 'Kochi', 'Chandigarh']
     tier3_cities = ['Nashik', 'Aurangabad', 'Solapur', 'Dhule', 'Jamnagar', 'Bhavnagar', 'Anand', 'Bharuch']
@@ -72,7 +72,7 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
         
         professions.append(np.random.choice(profession_categories[prof_cat]))
 
-    # --- 2. FINANCIALS (Enhanced with city tier impact) ---
+    # --- 2. FINANCIALS with city tier impact ---
     income_base_log = np.log(600000)
     age_income_boost = [age_groups.index(a) * 0.2 for a in age_group_choices]
     edu_income_boost = [(['High School', 'Diploma', 'Graduate', 'Post Graduate', 'Professional', 'Other'].index(e)) * 0.15 for e in educations]
@@ -112,7 +112,7 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
         else: score = np.random.randint(750, 850)
         credit_scores.append(score)
 
-    # --- 3. BEHAVIORAL (Enhanced with more features) ---
+    # --- 3. BEHAVIORAL  ---
     source_choices = np.random.choice(
         ['Google', 'Direct Traffic', 'Reference', 'Organic Search', 'Facebook', 'Affiliate', 'LinkedIn', 'Instagram'],
         size=n_samples, p=[0.28, 0.20, 0.15, 0.12, 0.08, 0.05, 0.07, 0.05]
@@ -135,7 +135,7 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
 
     page_views = np.clip((time_spent_website / 120 + np.random.randint(-2, 5, n_samples)), 1, 50).astype(int)
 
-    # Enhanced interaction features
+    # interaction features
     form_submissions = np.random.choice([0, 1, 2, 3], size=n_samples, p=[0.6, 0.25, 0.1, 0.05])
     
     # Previous interactions (indicates returning visitor)
@@ -154,7 +154,7 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
     day_of_week = [date.strftime('%A') for date in lead_dates]
     hour_of_day = [np.random.randint(9, 22) for _ in range(n_samples)]  # Business hours focus
     
-    # --- 5. ASSEMBLE The DataFrame (WITHOUT COMMENTS FIRST) ---
+    # --- 5. ASSEMBLE The DataFrame  ---
     df = pd.DataFrame({
         'phone_number': [fake.phone_number() for _ in range(n_samples)],
         'email': [f"{fake.first_name().lower()}.{fake.last_name().lower()}_{i}@test.com" for i in range(n_samples)],
@@ -184,14 +184,13 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
         missing_indices = np.random.choice(df.index, size=int(n_samples * missing_frac), replace=False)
         df.loc[missing_indices, col] = np.nan
     
-    # --- 6. GENERATE TARGET VARIABLE - FIXED FOR REALISTIC DISTRIBUTION ---
+    # --- 6. GENERATE TARGET VARIABLE  ---
     # Normalize features to 0-1 scale
     credit_norm = df['credit_score'].fillna(df['credit_score'].median()) / 850
     income_norm = np.log1p(df['income_inr'].fillna(df['income_inr'].median())) / np.log1p(df['income_inr'].max())
     time_norm = df['time_spent_website_secs'] / df['time_spent_website_secs'].max()
     pages_norm = df['page_views'] / df['page_views'].max()
-    
-    # FIXED: MUCH MORE RESTRICTIVE logit calculation for realistic distribution
+
     # Targeting ~15-20% high intent leads
     logit = (
         0.6 * credit_norm +           # Further reduced from 1.2 to 0.6
@@ -202,10 +201,10 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
         0.2 * df['previous_interactions'] - 2.5  # Much more negative baseline: -1.8 to -2.5
     )
     
-    # Age group impact - much more conservative
+    # Age group impact
     logit += df['age_group'].map({'18-25': -0.4, '26-35': 0.1, '36-50': 0.05, '51+': -0.3}).fillna(0)
     
-    # Lead source impact - much more conservative
+    # Lead source impact 
     logit += df['lead_source'].map({
         'Reference': 0.3,      # Further reduced from 0.4
         'Direct Traffic': 0.2, # Further reduced from 0.3
@@ -217,14 +216,14 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
         'Affiliate': -0.05     # Same
     }).fillna(0)
     
-    # City tier impact - much more conservative
+    # City tier impact
     city_tier_map = {
         city: 0.1 if city in tier1_cities else (0.02 if city in tier2_cities else -0.08) 
         for city in city_choices
     }
     logit += df['city'].map(city_tier_map).fillna(0)
     
-    # Property preference impact - much more conservative
+    # Property preference impact
     logit += df['property_type_preference'].map({
         'Villa': 0.15,     # Further reduced from 0.2
         '3BHK': 0.1,       # Further reduced from 0.15
@@ -293,7 +292,6 @@ def generate_realistic_lead_dataset_v3(n_samples=10000, random_state=42, noise_l
 def get_ml_training_features():
     """
     Return the list of features to be used for ML model training.
-    Comments should NOT be included here.
     """
     return [
         'gender', 'age_group', 'city', 'family_background', 'education', 
@@ -362,8 +360,6 @@ def create_feature_documentation():
 
 if __name__ == "__main__":
     print("Generating realistic lead scoring dataset...")
-    print("Key Fix: MUCH MORE RESTRICTIVE distribution targeting ~15-20% high intent leads")
-    print("Key Design: Comments are for RERANKING only, not ML training")
     print("=" * 60)
     
     lead_df_v3 = generate_realistic_lead_dataset_v3(n_samples=10000, noise_level=0.25)
@@ -423,5 +419,4 @@ if __name__ == "__main__":
     with open('dataset_documentation.md', 'w') as f:
         f.write(docs)
     print("\nFeature documentation saved to 'dataset_documentation.md'")
-    print("✅ Dataset is ready for ML training (structured features) + Reranking (comments)!")
-    print("✅ FIXED: Now has realistic ~15-20% high intent distribution instead of 70%!")
+    print("Dataset is ready for ML training (structured features) + Reranking (comments)!")
